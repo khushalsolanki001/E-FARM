@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Styles -->
+  <defs>
+    <style type="text/css">
+      .entity { fill: #e1f3d8; stroke: #3c8224; stroke-width: 2; }
+      .entity-text { font-family: Arial; font-size: 14px; fill: #333; }
+      .attribute { font-family: Arial; font-size: 12px; fill: #666; }
+      .relationship { font-family: Arial; font-size: 12px; fill: #0066cc; }
+      .line { stroke: #666; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Admin Entity -->
+  <g transform="translate(100,100)">
+    <rect width="200" height="120" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">Admin</text>
+    <text x="10" y="60" class="attribute">• admin_id (PK)</text>
+    <text x="10" y="80" class="attribute">• username</text>
+    <text x="10" y="100" class="attribute">• password</text>
+  </g>
+
+  <!-- User Entity -->
+  <g transform="translate(500,100)">
+    <rect width="200" height="180" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">User</text>
+    <text x="10" y="60" class="attribute">• user_id (PK)</text>
+    <text x="10" y="80" class="attribute">• name</text>
+    <text x="10" y="100" class="attribute">• email</text>
+    <text x="10" y="120" class="attribute">• password</text>
+    <text x="10" y="140" class="attribute">• mobile</text>
+    <text x="10" y="160" class="attribute">• address</text>
+  </g>
+
+  <!-- Product Entity -->
+  <g transform="translate(900,100)">
+    <rect width="200" height="160" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">Product</text>
+    <text x="10" y="60" class="attribute">• product_id (PK)</text>
+    <text x="10" y="80" class="attribute">• name</text>
+    <text x="10" y="100" class="attribute">• price</text>
+    <text x="10" y="120" class="attribute">• description</text>
+    <text x="10" y="140" class="attribute">• stock</text>
+  </g>
+
+  <!-- Order Entity -->
+  <g transform="translate(100,400)">
+    <rect width="200" height="160" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">Order</text>
+    <text x="10" y="60" class="attribute">• order_id (PK)</text>
+    <text x="10" y="80" class="attribute">• user_id (FK)</text>
+    <text x="10" y="100" class="attribute">• order_date</text>
+    <text x="10" y="120" class="attribute">• total_amount</text>
+    <text x="10" y="140" class="attribute">• status</text>
+  </g>
+
+  <!-- Cart Entity -->
+  <g transform="translate(500,400)">
+    <rect width="200" height="140" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">Cart</text>
+    <text x="10" y="60" class="attribute">• cart_id (PK)</text>
+    <text x="10" y="80" class="attribute">• user_id (FK)</text>
+    <text x="10" y="100" class="attribute">• product_id (FK)</text>
+    <text x="10" y="120" class="attribute">• quantity</text>
+  </g>
+
+  <!-- Review Entity -->
+  <g transform="translate(900,400)">
+    <rect width="200" height="160" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">Review</text>
+    <text x="10" y="60" class="attribute">• review_id (PK)</text>
+    <text x="10" y="80" class="attribute">• user_id (FK)</text>
+    <text x="10" y="100" class="attribute">• product_id (FK)</text>
+    <text x="10" y="120" class="attribute">• rating</text>
+    <text x="10" y="140" class="attribute">• comment</text>
+  </g>
+
+  <!-- Payment Entity -->
+  <g transform="translate(500,650)">
+    <rect width="200" height="140" class="entity" rx="5"/>
+    <text x="100" y="30" text-anchor="middle" class="entity-text">Payment</text>
+    <text x="10" y="60" class="attribute">• payment_id (PK)</text>
+    <text x="10" y="80" class="attribute">• order_id (FK)</text>
+    <text x="10" y="100" class="attribute">• amount</text>
+    <text x="10" y="120" class="attribute">• payment_date</text>
+  </g>
+
+  <!-- Relationships -->
+  <!-- Admin - Product -->
+  <line x1="300" y1="160" x2="900" y2="160" class="line"/>
+  <text x="600" y="150" text-anchor="middle" class="relationship">manages</text>
+
+  <!-- User - Order -->
+  <line x1="500" y1="280" x2="200" y2="400" class="line"/>
+  <text x="350" y="340" text-anchor="middle" class="relationship">places</text>
+
+  <!-- User - Cart -->
+  <line x1="600" y1="280" x2="600" y2="400" class="line"/>
+  <text x="620" y="340" text-anchor="middle" class="relationship">has</text>
+
+  <!-- User - Review -->
+  <line x1="700" y1="280" x2="900" y2="400" class="line"/>
+  <text x="800" y="340" text-anchor="middle" class="relationship">writes</text>
+
+  <!-- Order - Payment -->
+  <line x1="200" y1="560" x2="500" y2="650" class="line"/>
+  <text x="350" y="605" text-anchor="middle" class="relationship">has</text>
+
+  <!-- Product - Cart -->
+  <line x1="1000" y1="260" x2="700" y2="400" class="line"/>
+  <text x="850" y="330" text-anchor="middle" class="relationship">contains</text>
+
+  <!-- Product - Review -->
+  <line x1="1000" y1="260" x2="1000" y2="400" class="line"/>
+  <text x="1020" y="330" text-anchor="middle" class="relationship">has</text>
+</svg>

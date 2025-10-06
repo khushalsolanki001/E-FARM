@@ -1,0 +1,207 @@
+Folder PATH listing for volume Windows
+Volume serial number is 463B-D231
+C:.
+|   .gitattributes
+|   about.php
+|   alb.sql
+|   connection.php
+|   contact.php
+|   index.php
+|   item.php
+|   item_individual.php
+|   process_contact.php
+|   search.php
+|   tree.txt
+|   view.php
+|   
++---.cursor
+|   \---rules
++---admin
+|   |   admin_home.php
+|   |   a_logout.php
+|   |   confirm_order.php
+|   |   delete_item.php
+|   |   delete_item_connection.php
+|   |   delete_user.php
+|   |   delete_user_connection.php
+|   |   e-farm - Shortcut.lnk
+|   |   edit_item.php
+|   |   edit_item_connection.php
+|   |   insert_item.php
+|   |   insert_item_connection.php
+|   |   insert_user.php
+|   |   insert_user_connection.php
+|   |   item_image.php
+|   |   item_image_connection.php
+|   |   item_individual.php
+|   |   manage_stock.php
+|   |   search.php
+|   |   search1.php
+|   |   user_individual.php
+|   |   verify.php
+|   |   verify_connection.php
+|   |   view_item.php
+|   |   view_reviews.php
+|   |   view_user.php
+|   |   
+|   \---image
+|           1.PNG
+|           10.PNG
+|           11.PNG
+|           12.PNG
+|           121212.JPG
+|           13.PNG
+|           14.PNG
+|           15.PNG
+|           16.PNG
+|           17.PNG
+|           2.PNG
+|           3.PNG
+|           4.PNG
+|           5.PNG
+|           6.PNG
+|           7.PNG
+|           8.PNG
+|           9.PNG
+|           abc12.png
+|           abc123.jpeg
+|           apple.jpg
+|           banana.jpg
+|           Capture.PNG
+|           cumin.jpg
+|           farm1.jpg
+|           mango.jpg
+|           npk.jpg
+|           Pomegranate.jpg
+|           potato.jpg
+|           poteto.jpg
+|           pvc pipe.jpg
+|           pvcpipe.jpg
+|           stobary.jpg
+|           tomato.jpg
+|           Turmeric.jpg
+|           urea.jpg
+|           watermelon.jpg
+|           
++---css
+|   +---image
+|   |       347393526_250171240894141_1652025665265698400_n.jpg
+|   |       abc12.png
+|   |       abc123.jpeg
+|   |       abc321.png
+|   |       admin-add item.png
+|   |       admin-add user.png
+|   |       admin-home.png
+|   |       admin-login.png
+|   |       admin-manage prod.png
+|   |       admin-manage user.png
+|   |       admin-update stok.png
+|   |       admin-uplodimg.png
+|   |       adminimage.png
+|   |       allitem.png
+|   |       apple.jpg
+|   |       banana.jpg
+|   |       cart.png
+|   |       classdiagram.png
+|   |       cumin.jpg
+|   |       customer.jpg
+|   |       er_diagram.svg
+|   |       farm1.jpg
+|   |       farm2.jpg
+|   |       farm3.jpg
+|   |       farm4.jpg
+|   |       firstleveluser.png
+|   |       home.png
+|   |       home1.jpg
+|   |       imag.jpg
+|   |       img2.jpg
+|   |       img3.jpg
+|   |       img4.jpg
+|   |       img5.jpeg
+|   |       img6.jpeg
+|   |       index.png
+|   |       item.png
+|   |       item123.png
+|   |       login pge2.png
+|   |       login1.jpg
+|   |       login12.jpg
+|   |       pay.jpg
+|   |       poteto.jpg
+|   |       pvcpipe.jpg
+|   |       sign1.jpg
+|   |       sinpup.png
+|   |       usecase1diagram.png
+|   |       usecasedigram.png
+|   |       user home page.png
+|   |       user-account.png
+|   |       user-allitem.png
+|   |       user-item.png
+|   |       user-order.png
+|   |       usercard-pY.png
+|   |       usercash-pay.png
+|   |       
+|   \---screenshots
+|           acount.JPG
+|           admin ad.JPG
+|           admin add.JPG
+|           admin del usr.JPG
+|           admin delete.JPG
+|           admin image.JPG
+|           admin ind item view.JPG
+|           admin ind usr view.JPG
+|           admin index.JPG
+|           admin login.JPG
+|           admin mang.JPG
+|           admin update.JPG
+|           admin usr view.JPG
+|           confirm buy.JPG
+|           cus index.JPG
+|           cust view indi.JPG
+|           forgot password.JPG
+|           guest ind view.JPG
+|           guest view.JPG
+|           index.JPG
+|           login.JPG
+|           order.JPG
+|           pay.JPG
+|           signup.JPG
+|           view all.JPG
+|           wislist.JPG
+|           
++---login
+|       login.php
+|       login_connection.php
+|       reset.php
+|       reset_connection.php
+|       
++---signup
+|       signup.php
+|       signup_connection.php
+|       
+\---user
+        account_address.php
+        account_delete.php
+        account_edit.php
+        address.php
+        buy.php
+        buy_directly.php
+        delete_connection.php
+        edit_connection.php
+        item.php
+        item_individual.php
+        purchase.php
+        review.php
+        sale.php
+        sale_connection.php
+        search.php
+        submit_review.php
+        user.php
+        user_config.php
+        user_home.php
+        user_order.php
+        u_logout.php
+        view.php
+        view_wishlist.php
+        wishlist.php
+        wishlist_delete.php
+        
