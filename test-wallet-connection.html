@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Wallet Connection - E-FARM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2ecc71;
+            text-align: center;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Wallet Connection Test</h1>
+        
+        <div class="test-section">
+            <h3>📚 Library Status</h3>
+            <div id="library-status" class="status info">Checking libraries...</div>
+            <button class="btn" onclick="checkLibraries()">Check Libraries</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>👛 Phantom Wallet</h3>
+            <div id="wallet-status" class="status info">Not connected</div>
+            <button class="btn" onclick="connectWallet()">Connect Wallet</button>
+            <button class="btn" onclick="getBalance()">Get Balance</button>
+            <div id="wallet-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>💰 Price Test</h3>
+            <button class="btn" onclick="testPrice()">Test SOL Price</button>
+            <button class="btn" onclick="testConversion()">Test ₹ to SOL Conversion</button>
+            <div id="price-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <script>
+        let wallet = null;
+        let connection = null;
+        
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            checkLibraries();
+        });
+        
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'status ' + type;
+        }
+        
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'result ' + type;
+            element.style.display = 'block';
+        }
+        
+        function checkLibraries() {
+            let status = '';
+            let type = 'info';
+            
+            // Check Solana Web3.js
+            if (typeof window.solanaWeb3 !== 'undefined') {
+                status += '✅ Solana Web3.js: Loaded\n';
+            } else {
+                status += '❌ Solana Web3.js: Not loaded\n';
+                type = 'error';
+            }
+            
+            // Check Phantom Wallet
+            if (typeof window.solana !== 'undefined' && window.solana.isPhantom) {
+                status += '✅ Phantom Wallet: Detected\n';
+                wallet = window.solana;
+            } else {
+                status += '❌ Phantom Wallet: Not detected\n';
+                type = 'error';
+            }
+            
+            // Initialize connection if Web3 is available
+            if (typeof window.solanaWeb3 !== 'undefined') {
+                connection = new window.solanaWeb3.Connection('https://api.devnet.solana.com', 'confirmed');
+                status += '✅ Solana Connection: Initialized (Devnet)\n';
+            }
+            
+            updateStatus('library-status', status, type);
+        }
+        
+        async function connectWallet() {
+            try {
+                if (!wallet) {
+                    throw new Error('Phantom wallet not detected. Please install Phantom wallet.');
+                }
+                
+                updateStatus('wallet-status', 'Connecting...', 'info');
+                
+                const response = await wallet.connect();
+                
+                updateStatus('wallet-status', 'Connected: ' + response.publicKey.toString().substring(0, 8) + '...', 'success');
+                
+                showResult('wallet-result', 
+                    '✅ Wallet Connected Successfully!\n' +
+                    'Public Key: ' + response.publicKey.toString() + '\n' +
+                    'Network: Devnet', 
+                    'success'
+                );
+                
+            } catch (error) {
+                updateStatus('wallet-status', 'Connection failed', 'error');
+                showResult('wallet-result', '❌ Connection Failed\n' + error.message, 'error');
+            }
+        }
+        
+        async function getBalance() {
+            try {
+                if (!wallet || !wallet.publicKey) {
+                    throw new Error('Wallet not connected');
+                }
+                
+                if (!connection) {
+                    throw new Error('Solana connection not initialized');
+                }
+                
+                const balance = await connection.getBalance(wallet.publicKey);
+                const solBalance = balance / window.solanaWeb3.LAMPORTS_PER_SOL;
+                
+                showResult('wallet-result', 
+                    '💰 Wallet Balance\n' +
+                    'Balance: ' + solBalance.toFixed(6) + ' SOL\n' +
+                    'Lamports: ' + balance, 
+                    'success'
+                );
+                
+            } catch (error) {
+                showResult('wallet-result', '❌ Balance Check Failed\n' + error.message, 'error');
+            }
+        }
+        
+        async function testPrice() {
+            try {
+                const response = await fetch('http://localhost/E-FARM/solana-backend-php/sol-price.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('price-result', 
+                        '💰 SOL Price\n' +
+                        'Price: $' + data.price + ' USD\n' +
+                        'Price: ₹' + (data.price * 90).toFixed(2) + ' INR\n' +
+                        'Source: ' + data.source, 
+                        'success'
+                    );
+                } else {
+                    throw new Error('Failed to fetch price');
+                }
+                
+            } catch (error) {
+                showResult('price-result', '❌ Price Test Failed\n' + error.message, 'error');
+            }
+        }
+        
+        function testConversion() {
+            try {
+                const rupeesAmount = 1000; // Test with ₹1000
+                const usdAmount = rupeesAmount / 90; // 90₹ = 1$
+                const solPrice = 200; // Assume $200 SOL price
+                const solAmount = usdAmount / solPrice;
+                
+                showResult('price-result', 
+                    '🔄 Currency Conversion Test\n' +
+                    'Input: ₹' + rupeesAmount + '\n' +
+                    'USD: $' + usdAmount.toFixed(2) + ' (÷90)\n' +
+                    'SOL: ' + solAmount.toFixed(6) + ' SOL (÷$' + solPrice + ')\n' +
+                    'Rate: 90₹ = 1$', 
+                    'info'
+                );
+                
+            } catch (error) {
+                showResult('price-result', '❌ Conversion Test Failed\n' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Solana Payment</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 3px; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Solana Payment Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h3>1. Library Status</h3>
+        <div id="library-status">Checking...</div>
+        <button onclick="checkLibraries()">Check Libraries</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>2. Wallet Connection</h3>
+        <div id="wallet-status">Not connected</div>
+        <button onclick="connectWallet()">Connect Wallet</button>
+        <button onclick="disconnectWallet()">Disconnect Wallet</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>3. Backend Health</h3>
+        <div id="backend-status">Checking...</div>
+        <button onclick="checkBackend()">Check Backend</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>4. SOL Price</h3>
+        <div id="price-status">Not fetched</div>
+        <button onclick="fetchPrice()">Fetch SOL Price</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>5. Test Transaction</h3>
+        <input type="number" id="test-amount" placeholder="Amount in ₹" value="100">
+        <button onclick="testTransaction()">Test Transaction</button>
+        <div id="transaction-status">Ready to test</div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>6. Console Logs</h3>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <div id="console-logs" class="log"></div>
+    </div>
+
+    <!-- Load Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <script>
+        // Override console.log to show in our debug panel
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function addToLog(message, type = 'log') {
+            const logDiv = document.getElementById('console-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            logDiv.textContent += logEntry;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToLog(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToLog(args.join(' '), 'error');
+        };
+        
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = type;
+        }
+        
+        function checkLibraries() {
+            console.log('Checking libraries...');
+            
+            // Check Solana Web3
+            if (typeof window.solanaWeb3 !== 'undefined') {
+                updateStatus('library-status', '✅ Solana Web3 loaded', 'success');
+                console.log('Solana Web3 version:', window.solanaWeb3.VERSION || 'Unknown');
+            } else {
+                updateStatus('library-status', '❌ Solana Web3 not loaded', 'error');
+                console.error('Solana Web3 library not found');
+            }
+            
+            // Check Phantom Wallet
+            if (window.solana && window.solana.isPhantom) {
+                updateStatus('wallet-status', '✅ Phantom wallet detected', 'success');
+                console.log('Phantom wallet detected');
+            } else {
+                updateStatus('wallet-status', '❌ Phantom wallet not detected', 'error');
+                console.error('Phantom wallet not found');
+            }
+        }
+        
+        async function connectWallet() {
+            try {
+                console.log('Attempting to connect wallet...');
+                
+                if (!window.solana) {
+                    throw new Error('Phantom wallet not installed');
+                }
+                
+                const response = await window.solana.connect();
+                console.log('Wallet connected:', response.publicKey.toString());
+                updateStatus('wallet-status', `✅ Connected: ${response.publicKey.toString().substring(0, 8)}...`, 'success');
+                
+                // Get balance
+                try {
+                    const connection = new window.solanaWeb3.Connection('https://api.devnet.solana.com');
+                    const balance = await connection.getBalance(response.publicKey);
+                    const solBalance = balance / window.solanaWeb3.LAMPORTS_PER_SOL;
+                    console.log('Wallet balance:', solBalance, 'SOL');
+                } catch (balanceError) {
+                    console.error('Failed to get balance:', balanceError);
+                }
+                
+            } catch (error) {
+                console.error('Wallet connection failed:', error);
+                updateStatus('wallet-status', `❌ Connection failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function disconnectWallet() {
+            if (window.solana && window.solana.disconnect) {
+                window.solana.disconnect();
+                updateStatus('wallet-status', 'Disconnected', 'info');
+                console.log('Wallet disconnected');
+            }
+        }
+        
+        async function checkBackend() {
+            try {
+                console.log('Checking backend health...');
+                const response = await fetch('http://localhost/E-FARM/solana-backend-php/health.php');
+                const data = await response.json();
+                
+                console.log('Backend response:', data);
+                
+                if (data.status === 'healthy' || data.status === 'ok') {
+                    updateStatus('backend-status', '✅ Backend is running', 'success');
+                    console.log('Backend health check passed');
+                } else {
+                    updateStatus('backend-status', '❌ Backend error: ' + JSON.stringify(data), 'error');
+                    console.error('Backend health check failed:', data);
+                }
+            } catch (error) {
+                updateStatus('backend-status', '❌ Backend unreachable: ' + error.message, 'error');
+                console.error('Backend check failed:', error);
+            }
+        }
+        
+        async function fetchPrice() {
+            try {
+                console.log('Fetching SOL price...');
+                const response = await fetch('http://localhost/E-FARM/solana-backend-php/sol-price.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatus('price-status', `✅ SOL Price: $${data.price}`, 'success');
+                    console.log('SOL price fetched:', data.price);
+                } else {
+                    updateStatus('price-status', '❌ Price fetch failed: ' + data.error, 'error');
+                    console.error('Price fetch failed:', data);
+                }
+            } catch (error) {
+                updateStatus('price-status', '❌ Price fetch error: ' + error.message, 'error');
+                console.error('Price fetch error:', error);
+            }
+        }
+        
+        async function testTransaction() {
+            const amount = parseFloat(document.getElementById('test-amount').value);
+            if (!amount || amount <= 0) {
+                updateStatus('transaction-status', '❌ Please enter a valid amount', 'error');
+                return;
+            }
+            
+            try {
+                updateStatus('transaction-status', 'Testing transaction...', 'info');
+                console.log('Testing transaction for amount:', amount);
+                
+                // Check prerequisites
+                if (!window.solana || !window.solana.publicKey) {
+                    throw new Error('Wallet not connected');
+                }
+                
+                if (typeof window.solanaWeb3 === 'undefined') {
+                    throw new Error('Solana Web3 not loaded');
+                }
+                
+                // Get SOL price
+                const priceResponse = await fetch('http://localhost/E-FARM/solana-backend-php/sol-price.php');
+                const priceData = await priceResponse.json();
+                
+                if (!priceData.success) {
+                    throw new Error('Failed to get SOL price');
+                }
+                
+                const solPrice = priceData.price;
+                const usdAmount = amount / 90; // Convert ₹ to $
+                const solAmount = usdAmount / solPrice;
+                
+                console.log('Transaction details:', {
+                    rupeesAmount: amount,
+                    usdAmount,
+                    solPrice,
+                    solAmount
+                });
+                
+                // Create a simple transaction (but don't send it)
+                const connection = new window.solanaWeb3.Connection('https://api.devnet.solana.com');
+                const transaction = new window.solanaWeb3.Transaction();
+                
+                const lamports = Math.floor(solAmount * window.solanaWeb3.LAMPORTS_PER_SOL);
+                const recipient = new window.solanaWeb3.PublicKey('AWgfH77xHcoegXMHo8W8hj54iea84qXYFAZUUvVQCYCp');
+                
+                transaction.add(
+                    window.solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: window.solana.publicKey,
+                        toPubkey: recipient,
+                        lamports: lamports
+                    })
+                );
+                
+                updateStatus('transaction-status', `✅ Transaction created successfully! Amount: ${solAmount.toFixed(6)} SOL`, 'success');
+                console.log('Transaction created successfully');
+                
+            } catch (error) {
+                updateStatus('transaction-status', `❌ Test failed: ${error.message}`, 'error');
+                console.error('Transaction test failed:', error);
+            }
+        }
+        
+        function clearLogs() {
+            document.getElementById('console-logs').textContent = '';
+        }
+        
+        // Auto-check on page load
+        window.addEventListener('load', function() {
+            console.log('Debug page loaded');
+            checkLibraries();
+            checkBackend();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Wallet Test - E-FARM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2ecc71;
+            text-align: center;
+        }
+        
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status {
+            font-weight: bold;
+        }
+        
+        .success {
+            color: green;
+        }
+        
+        .error {
+            color: red;
+        }
+        
+        .warning {
+            color: orange;
+        }
+        
+        .btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #27ae60;
+        }
+        
+        .console-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Quick Wallet Connection Test</h1>
+        
+        <div class="test-item">
+            <span>JavaScript Working:</span>
+            <span id="js-status" class="status">Testing...</span>
+        </div>
+        
+        <div class="test-item">
+            <span>Solana Web3.js:</span>
+            <span id="web3-status" class="status">Testing...</span>
+        </div>
+        
+        <div class="test-item">
+            <span>Phantom Wallet:</span>
+            <span id="phantom-status" class="status">Testing...</span>
+        </div>
+        
+        <div class="test-item">
+            <span>Backend API:</span>
+            <span id="backend-status" class="status">Testing...</span>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn" onclick="runAllTests()">🔄 Run All Tests</button>
+            <button class="btn" onclick="connectWallet()">👛 Connect Wallet</button>
+        </div>
+        
+        <div class="console-output" id="console-output">
+            <div>Console Output:</div>
+            <div id="console-log"></div>
+        </div>
+    </div>
+
+    <!-- Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <script>
+        let consoleLog = document.getElementById('console-log');
+        
+        function log(message) {
+            console.log(message);
+            consoleLog.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+        
+        function updateStatus(elementId, status, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = status;
+            element.className = 'status ' + type;
+        }
+        
+        function runAllTests() {
+            log('Starting all tests...');
+            
+            // Test 1: JavaScript
+            updateStatus('js-status', '✅ Working', 'success');
+            log('JavaScript: Working');
+            
+            // Test 2: Solana Web3
+            if (typeof window.solanaWeb3 !== 'undefined') {
+                updateStatus('web3-status', '✅ Loaded', 'success');
+                log('Solana Web3: Loaded successfully');
+            } else {
+                updateStatus('web3-status', '❌ Not loaded', 'error');
+                log('Solana Web3: Failed to load');
+            }
+            
+            // Test 3: Phantom Wallet
+            if (typeof window.solana !== 'undefined' && window.solana.isPhantom) {
+                updateStatus('phantom-status', '✅ Detected', 'success');
+                log('Phantom Wallet: Detected');
+            } else {
+                updateStatus('phantom-status', '❌ Not detected', 'error');
+                log('Phantom Wallet: Not detected - Please install Phantom wallet');
+            }
+            
+            // Test 4: Backend
+            fetch('http://localhost/E-FARM/solana-backend-php/health.php')
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus('backend-status', '✅ Connected', 'success');
+                    log('Backend: Connected successfully');
+                })
+                .catch(error => {
+                    updateStatus('backend-status', '❌ Failed', 'error');
+                    log('Backend: Connection failed - ' + error.message);
+                });
+        }
+        
+        async function connectWallet() {
+            try {
+                if (!window.solana || !window.solana.isPhantom) {
+                    throw new Error('Phantom wallet not detected');
+                }
+                
+                log('Attempting to connect wallet...');
+                const response = await window.solana.connect();
+                
+                log('Wallet connected: ' + response.publicKey.toString());
+                alert('Wallet connected successfully!\nAddress: ' + response.publicKey.toString().substring(0, 8) + '...');
+                
+            } catch (error) {
+                log('Wallet connection failed: ' + error.message);
+                alert('Wallet connection failed: ' + error.message);
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.addEventListener('load', function() {
+            log('Page loaded, running tests...');
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+RewriteEngine On
+
+# Handle API routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ solana-api.php [QSA,L]
+
+# Handle direct access to solana-api.php
+RewriteRule ^solana-api\.php$ solana-api.php [L]

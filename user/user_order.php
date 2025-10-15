@@ -6,7 +6,7 @@
     }
     else
     {
-    	include 'user_config.php';
+        include 'user_config.php';
     }
 ?>
 <!DOCTYPE html>
@@ -431,7 +431,41 @@
             ?>
         </div>
 
+        <h3 class="section-title" style="margin-top: 30px; color:#00875A;"><i class="fab fa-bitcoin"></i>Solana/Crypto Payment Orders</h3>
         <?php
+        // Show crypto/solana orders for this user
+        $crypto_sql = "SELECT cp.*, i.name, i.img FROM crypto_payments cp JOIN items i ON cp.items_id = i.items_id WHERE cp.users_id = $_SESSION[users_id] ORDER BY cp.created_at DESC";
+        $crypto_result = mysqli_query($conn, $crypto_sql);
+        $cryptoOrdersCount = mysqli_num_rows($crypto_result);
+        if($cryptoOrdersCount > 0) {
+            while ($row = mysqli_fetch_assoc($crypto_result)) {
+                ?>
+                <div class="order-card crypto-order">
+                    <div class="order-id">
+                        <i class="fab fa-bitcoin"></i>
+                        <span class="payment-badge crypto">Solana/Crypto</span>
+                        <br>Txn Hash:<br><span style='font-size:0.9em;word-break:break-all;'><?php echo htmlspecialchars($row['signature']); ?></span>
+                    </div>
+                    <div class="order-name">
+                        <a href="item_individual.php?items_id=<?php echo $row['items_id']; ?>">
+                            <?php echo $row['name']; ?>
+                        </a>
+                    </div>
+                    <div class="order-date">
+                        <i class="far fa-calendar"></i>
+                        <?php echo date('d M Y', strtotime($row['created_at'])); ?>
+                    </div>
+                    <div class="order-total">
+                        <i class="fas fa-rupee-sign"></i>
+                        <?php echo number_format($row['total_rupees'], 2); ?>
+                    </div>
+                </div>
+                <?php
+            }
+        } else {
+            echo "<p class='text-center' style='padding: 20px;'>No Solana/Crypto orders yet</p>";
+        }
+
         if(isset($_SESSION['tmp'])) {
             echo '<div class="alert">' . $_SESSION['tmp'] . '</div>';
             unset($_SESSION['tmp']);

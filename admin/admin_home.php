@@ -318,7 +318,37 @@
         ?>
         </table>
 
-        <h2 class="orders-title" style="margin-top:30px;">CARD PAYMENT ORDERS</h2>
+    <h2 class="orders-title" style="margin-top:30px;">CARD PAYMENT ORDERS</h2>
+        <h2 class="orders-title" style="margin-top:30px; color:#00875A;">SOLANA/CRYPTO PAYMENT ORDERS</h2>
+        <?php include 'crypto_payments.php'; ?>
+        <table class="orders-table">
+        <tr>
+            <th>User name</th>
+            <th>Item name</th>
+            <th>Amount (₹)</th>
+            <th>SOL Amount</th>
+            <th>USD Amount</th>
+            <th>Date</th>
+            <th>Transaction Hash</th>
+        </tr>
+        <?php
+        if (!empty($crypto_orders)) {
+            foreach ($crypto_orders as $row) {
+                echo "<tr>";
+                echo "<td>".htmlspecialchars($row['user_name'])."</td>";
+                echo "<td>".htmlspecialchars($row['item_name'])."</td>";
+                echo "<td>₹".htmlspecialchars($row['total_rupees'])."</td>";
+                echo "<td>".htmlspecialchars($row['sol_amount'])."</td>";
+                echo "<td>".htmlspecialchars($row['usd_amount'])."</td>";
+                echo "<td>".htmlspecialchars($row['created_at'])."</td>";
+                echo "<td style='font-size:0.9em;word-break:break-all;'>".htmlspecialchars($row['signature'])."</td>";
+                echo "</tr>";
+            }
+        } else {
+            echo "<tr><td colspan='7' style='text-align:center'>No crypto orders found</td></tr>";
+        }
+        ?>
+        </table>
         <table class="orders-table">
 
 		<tr>

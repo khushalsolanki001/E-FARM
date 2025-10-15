@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Solana Payment - E-FARM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Solana Web3.js -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f7;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2ecc71;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+        
+        .test-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .payment-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Solana Payment System Test</h1>
+        
+        <!-- Backend Tests -->
+        <div class="test-section">
+            <h3>🔧 Backend Tests</h3>
+            <button class="btn" onclick="testHealth()">Test Health Check</button>
+            <button class="btn" onclick="testSolPrice()">Test SOL Price</button>
+            <div id="backend-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Wallet Tests -->
+        <div class="test-section">
+            <h3>👛 Wallet Tests</h3>
+            <button class="btn" onclick="testWalletConnection()">Test Wallet Connection</button>
+            <button class="btn" onclick="testWalletBalance()">Test Wallet Balance</button>
+            <div id="wallet-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <!-- Payment Simulation -->
+        <div class="test-section">
+            <h3>💳 Payment Simulation</h3>
+            <div class="payment-form">
+                <div class="form-group">
+                    <label class="form-label">Order Amount (₹ Rupees):</label>
+                    <input type="number" id="order-amount" class="form-input" value="1000" min="1" step="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Order ID:</label>
+                    <input type="text" id="order-id" class="form-input" value="TEST_ORDER_123">
+                </div>
+                <button class="btn" onclick="simulatePayment()">Simulate Payment</button>
+                <div id="payment-result" class="result" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- Status Display -->
+        <div class="test-section">
+            <h3>📊 System Status</h3>
+            <div id="system-status" class="status info">
+                Initializing system...
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Solana Payment Script -->
+    <script src="solana-payment.js"></script>
+    
+    <script>
+        let solanaPaymentInstance = null;
+        
+        // Initialize the system
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSystem();
+        });
+        
+        async function initializeSystem() {
+            try {
+                solanaPaymentInstance = new SolanaPayment();
+                updateStatus('System initialized successfully', 'success');
+                
+                // Test backend connectivity
+                await testHealth();
+            } catch (error) {
+                updateStatus('System initialization failed: ' + error.message, 'error');
+            }
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+        }
+        
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.textContent = message;
+            resultDiv.className = 'result ' + type;
+            resultDiv.style.display = 'block';
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch('http://localhost/E-FARM/solana-backend-php/health.php');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('backend-result', 
+                        '✅ Health Check Passed\n' + 
+                        'Status: ' + data.status + '\n' + 
+                        'Version: ' + data.version + '\n' + 
+                        'Timestamp: ' + data.timestamp, 
+                        'success'
+                    );
+                    updateStatus('Backend is healthy', 'success');
+                } else {
+                    throw new Error('Health check failed');
+                }
+            } catch (error) {
+                showResult('backend-result', '❌ Health Check Failed\n' + error.message, 'error');
+                updateStatus('Backend connection failed', 'error');
+            }
+        }
+        
+        async function testSolPrice() {
+            try {
+                const response = await fetch('http://localhost/E-FARM/solana-backend-php/sol-price.php');
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('backend-result', 
+                        '✅ SOL Price Retrieved\n' + 
+                        'Price: $' + data.price + ' USD\n' + 
+                        'Source: ' + data.source + '\n' + 
+                        'Timestamp: ' + data.timestamp, 
+                        'success'
+                    );
+                } else {
+                    throw new Error('Failed to fetch SOL price');
+                }
+            } catch (error) {
+                showResult('backend-result', '❌ SOL Price Failed\n' + error.message, 'error');
+            }
+        }
+        
+        async function testWalletConnection() {
+            try {
+                if (!solanaPaymentInstance) {
+                    throw new Error('Solana payment system not initialized');
+                }
+                
+                const result = await solanaPaymentInstance.connectWallet();
+                
+                if (result.success) {
+                    showResult('wallet-result', 
+                        '✅ Wallet Connected\n' + 
+                        'Public Key: ' + result.publicKey + '\n' + 
+                        'Message: ' + result.message, 
+                        'success'
+                    );
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showResult('wallet-result', '❌ Wallet Connection Failed\n' + error.message, 'error');
+            }
+        }
+        
+        async function testWalletBalance() {
+            try {
+                if (!solanaPaymentInstance || !solanaPaymentInstance.isConnected) {
+                    throw new Error('Wallet not connected');
+                }
+                
+                const balance = await solanaPaymentInstance.getWalletBalance();
+                showResult('wallet-result', 
+                    '✅ Wallet Balance Retrieved\n' + 
+                    'Balance: ' + balance.toFixed(6) + ' SOL', 
+                    'success'
+                );
+            } catch (error) {
+                showResult('wallet-result', '❌ Balance Check Failed\n' + error.message, 'error');
+            }
+        }
+        
+        async function simulatePayment() {
+            try {
+                const amount = parseFloat(document.getElementById('order-amount').value);
+                const orderId = document.getElementById('order-id').value;
+                
+                if (!amount || amount <= 0) {
+                    throw new Error('Invalid amount');
+                }
+                
+                if (!orderId) {
+                    throw new Error('Order ID is required');
+                }
+                
+                // Get SOL price
+                const solPrice = await solanaPaymentInstance.fetchSolPrice();
+                const solAmount = solanaPaymentInstance.convertRupeesToSol(amount);
+                
+                showResult('payment-result', 
+                    '💰 Payment Simulation (₹ to SOL)\n' + 
+                    'Order ID: ' + orderId + '\n' + 
+                    'Rupees Amount: ₹' + amount.toFixed(2) + '\n' + 
+                    'USD Amount: $' + (amount/90).toFixed(2) + ' (÷90)\n' + 
+                    'SOL Price: $' + solPrice.toFixed(2) + '\n' + 
+                    'SOL Amount: ' + solAmount.toFixed(6) + ' SOL\n\n' + 
+                    'Note: This is a simulation. No actual transaction will be sent.', 
+                    'info'
+                );
+                
+            } catch (error) {
+                showResult('payment-result', '❌ Payment Simulation Failed\n' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
