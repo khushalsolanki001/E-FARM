@@ -301,7 +301,7 @@
                 die('Connect error('. mysqli_connect_error().')'. mysqli_connect_error());
             }
 
-            // First display Card Payment Orders
+            // First disphdjfhdjbfjlay Card Payment Orders
             ?>
             <h3 class="section-title"><i class="fas fa-credit-card"></i>Card Payment Orders</h3>
             <?php
